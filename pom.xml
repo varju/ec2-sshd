@@ -11,6 +11,13 @@
   <name>SSHD for EC2 Windows</name>
   <description>SSH daemon implementation for EC2 Windows instances</description>
 
+  <repositories>
+    <repository>
+      <id>maven.jenkins-ci.org</id>
+      <url>http://maven.jenkins-ci.org:8081/content/repositories/releases</url>
+    </repository>
+  </repositories>
+
   <scm>
     <connection>scm:git:git@github.com/kohsuke/${project.artifactId}.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/kohsuke/${project.artifactId}.git</developerConnection>
