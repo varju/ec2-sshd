@@ -9,15 +9,14 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.logging.Logger;
-import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
-import org.apache.sshd.common.cipher.AES128CBC;
-import org.apache.sshd.common.cipher.BlowfishCBC;
-import org.apache.sshd.common.cipher.TripleDESCBC;
+import org.apache.sshd.common.cipher.BuiltinCiphers;
+import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.util.SecurityUtils;
-import org.apache.sshd.server.PublickeyAuthenticator;
-import org.apache.sshd.server.UserAuth;
-import org.apache.sshd.server.auth.UserAuthPublicKey;
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.UserAuth;
+import org.apache.sshd.server.auth.UserAuthPublicKeyFactory;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.command.ScpCommandFactory;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.shell.ProcessShellFactory;
@@ -54,11 +53,11 @@ public class Main {
         SecurityUtils.setRegisterBouncyCastle(true); // really make sure we have Bouncy Castle, or else die.
 
         SshServer sshd = SshServer.setUpDefaultServer();
-        sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthPublicKey.Factory()));
+        sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthPublicKeyFactory()));
         sshd.setCipherFactories(Arrays.asList(// AES 256 and 192 requires unlimited crypto, so don't use that
-                new AES128CBC.Factory(),
-                new TripleDESCBC.Factory(),
-                new BlowfishCBC.Factory()));
+                (NamedFactory<Cipher>) BuiltinCiphers.aes128cbc,
+                BuiltinCiphers.tripledescbc,
+                BuiltinCiphers.blowfishcbc));
 
         sshd.setPort(port);
 
@@ -68,7 +67,7 @@ public class Main {
         sshd.setKeyPairProvider(new KeyPairProviderImpl());     // for now, Hudson doesn't authenticate the EC2 instance.
 
         sshd.setShellFactory(new ProcessShellFactory(new String[] {"cmd.exe"}));
-        sshd.setCommandFactory(new ScpCommandFactory(new CommandFactoryImpl()));
+        sshd.setCommandFactory(new ScpCommandFactory.Builder().withDelegate(new CommandFactoryImpl()).build());
 
         // load key from command line argument for debug assistance
         KeyProvider kp = keyFile == null ? new EC2InstanceDataKeyProvider() : new FileKeyProvider(keyFile);

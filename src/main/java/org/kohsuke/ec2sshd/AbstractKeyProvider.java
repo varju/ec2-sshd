@@ -4,7 +4,6 @@ import com.github.fommil.ssh.SshRsaCrypto;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-import org.apache.sshd.common.util.Buffer;
 import org.bouncycastle.util.encoders.Base64;
 
 abstract public class AbstractKeyProvider implements KeyProvider {
