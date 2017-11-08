@@ -82,6 +82,7 @@ public class Main {
         });
 
         sshd.start();
+        Thread.sleep(Long.MAX_VALUE);
     }
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
