@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.cipher.BuiltinCiphers;
 import org.apache.sshd.common.cipher.Cipher;
-import org.apache.sshd.common.util.SecurityUtils;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
@@ -50,8 +49,6 @@ public class Main {
     }
 
     public  void run() throws Exception {
-        SecurityUtils.setRegisterBouncyCastle(true); // really make sure we have Bouncy Castle, or else die.
-
         SshServer sshd = SshServer.setUpDefaultServer();
         sshd.setUserAuthFactories(Arrays.<NamedFactory<UserAuth>>asList(new UserAuthPublicKeyFactory()));
         sshd.setCipherFactories(Arrays.asList(// AES 256 and 192 requires unlimited crypto, so don't use that
